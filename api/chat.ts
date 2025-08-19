@@ -1,21 +1,32 @@
+// FILE: api/chat.ts
+
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GoogleAIStream, StreamingTextResponse } from 'ai';
 
-// IMPORTANT! Set the runtime to edge
-export const runtime = 'edge';
+// Configure the runtime for the edge
+export const config = {
+  runtime: 'edge',
+};
 
-export async function POST(req: Request) {
+// The handler must be a default export.
+// It can handle any request method, so we need to check for POST.
+export default async function handler(req: Request): Promise<Response> {
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405 });
+  }
+
   try {
     const { messages } = await req.json();
 
-    // Determine the base URL for fetching the content file
-    // This works for both local development and Vercel deployment
+    // Determine the base URL for fetching the content file.
+    // Using the URL constructor is safer than string concatenation.
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
     const host = req.headers.get('host');
     const baseUrl = `${protocol}://${host}`;
 
     // Fetch the knowledge base from the public folder
-    const knowledgeBaseResponse = await fetch(`${baseUrl}/content.md`);
+    const knowledgeBaseResponse = await fetch(new URL('/content.md', baseUrl));
     if (!knowledgeBaseResponse.ok) {
         throw new Error('Failed to fetch knowledge base.');
     }
