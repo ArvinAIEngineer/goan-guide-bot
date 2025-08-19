@@ -1,7 +1,7 @@
 // FILE: api/chat.ts
 
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamText } from 'ai';
+import { streamText, StreamingTextResponse } from 'ai';
 
 // Import the knowledgeBase constant from our new TypeScript module.
 import { knowledgeBase } from './content';
@@ -32,22 +32,21 @@ ${knowledgeBase}
 
 Now, continue the conversation with the user.`;
 
-    // Instantiate the Google provider using the createGoogleGenerativeAI factory
     const google = createGoogleGenerativeAI({
       apiKey: process.env.GOOGLE_API_KEY,
     });
     
-    // Call the streamText helper with the model, system prompt, and messages
     const result = await streamText({
-      // *** THIS IS THE FIX ***
-      // The model ID must include the 'models/' prefix.
       model: google('models/gemini-1.5-flash'),
       system: systemPrompt,
       messages: messages,
     });
 
-    // Respond with the stream using the built-in Vercel AI SDK response helper
-    return result.toAIStreamResponse();
+    // *** THE DEFINITIVE FIX ***
+    // Instead of using result.toAIStreamResponse(), we manually create
+    // the StreamingTextResponse from the raw text stream. This forces
+    // the correct v3-compatible format and bypasses the environmental issue.
+    return new StreamingTextResponse(result.textStream);
 
   } catch (error) {
     console.error("An error occurred in the chat API:", error);
