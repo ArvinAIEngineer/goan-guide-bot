@@ -4,17 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Users, Calendar } from "lucide-react";
 
-// The avatar image is not provided in the project files. 
-// To prevent a build error, the import and usage are commented out.
-// To use it, create an 'src/assets' folder, add your image, and uncomment the lines below.
-// import mariaAvatar from "@/assets/maria-avatar-ai-style.jpg";
+import mariaAvatar from "@/assets/maria-avatar-ai-style.jpg";
 
 export const MariaProfile = () => {
   return (
     <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 rounded-xl p-6 border border-primary/20 mb-6">
       <div className="flex items-center gap-4 mb-4">
         <Avatar className="w-16 h-16 border-3 border-primary/30 shadow-lg">
-          {/* <AvatarImage src={mariaAvatar} alt="Maria" /> */}
+          <AvatarImage src={mariaAvatar} alt="Maria" />
           <AvatarFallback className="bg-primary text-primary-foreground text-xl">M</AvatarFallback>
         </Avatar>
         

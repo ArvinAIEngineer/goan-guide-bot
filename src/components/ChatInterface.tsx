@@ -1,7 +1,4 @@
-// FILE: src/components/ChatInterface.tsx
-
-import { useChat } from '@ai-sdk/react'; // <<< THIS IS THE FIX
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatMessage } from "./ChatMessage";
@@ -9,31 +6,99 @@ import { Send, Sparkles } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export const ChatInterface = () => {
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      role: 'assistant',
+      content: "Olá! I'm Maria from Goa! 🌴 I'm here to help you learn everything about EO Goa - our entrepreneurial community, events, members, and all things related to our beautiful organization. What would you like to know?",
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // The useChat hook handles all the logic for you.
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    initialMessages: [
-      {
-        id: '1',
-        role: 'assistant',
-        content: "Olá! I'm Maria from Goa! 🌴 I'm here to help you learn everything about EO Goa - our entrepreneurial community, events, members, and all things related to our beautiful organization. What would you like to know?",
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input.trim()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
       }
-    ],
-    api: '/api/chat',
-    onError: (err) => {
-      console.error("Chat error:", err);
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No response body');
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: ''
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+
+      const decoder = new TextDecoder();
+      let done = false;
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        
+        if (value) {
+          const chunk = decoder.decode(value);
+          setMessages(prev => {
+            const newMessages = [...prev];
+            const lastMessage = newMessages[newMessages.length - 1];
+            if (lastMessage.role === 'assistant') {
+              lastMessage.content += chunk;
+            }
+            return newMessages;
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
       toast({
         title: "Error",
-        description: "Failed to get a response. Please check your connection or API key.",
+        description: "Failed to get a response. Please check your connection or try again.",
         variant: "destructive",
       });
-    },
-  });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // Automatically scroll to the bottom when new messages are added.
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -75,7 +140,7 @@ export const ChatInterface = () => {
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             value={input}
-            onChange={handleInputChange}
+            onChange={(e) => setInput(e.target.value)}
             placeholder="Ask Maria about EO Goa..."
             className="flex-1 rounded-full border-primary/20 focus:border-primary"
             disabled={isLoading}
