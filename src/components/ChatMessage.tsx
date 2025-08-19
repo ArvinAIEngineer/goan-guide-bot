@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import mariaAvatar from "@/assets/maria-avatar.jpg";
+import mariaAvatar from "@/assets/maria-avatar-ai-style.jpg";
 
 interface ChatMessageProps {
   message: string;

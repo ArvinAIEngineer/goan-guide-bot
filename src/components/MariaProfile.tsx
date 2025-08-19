@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Users, Calendar } from "lucide-react";
-import mariaAvatar from "@/assets/maria-avatar.jpg";
+import mariaAvatar from "@/assets/maria-avatar-ai-style.jpg";
 
 export const MariaProfile = () => {
   return (
