@@ -11,19 +11,22 @@ import { useToast } from "@/components/ui/use-toast";
 
 export const ChatInterface = () => {
   const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // The useChat hook handles all the logic for you.
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
-    // The initial messages will be rendered on first load
+    // The initial messages will be rendered on first load.
     initialMessages: [
       {
         id: '1',
+        // The role for the AI's messages is 'assistant'.
         role: 'assistant',
         content: "Olá! I'm Maria from Goa! 🌴 I'm here to help you learn everything about EO Goa - our entrepreneurial community, events, members, and all things related to our beautiful organization. What would you like to know?",
       }
     ],
-    // The API route that the hook will call
+    // The API route that the hook will call.
     api: '/api/chat',
-    // Handle errors from the API call
+    // This function will be called if the API returns an error.
     onError: (err) => {
       console.error("Chat error:", err);
       toast({
@@ -34,14 +37,9 @@ export const ChatInterface = () => {
     },
   });
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Automatically scroll to the bottom when new messages are added.
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
@@ -54,12 +52,10 @@ export const ChatInterface = () => {
               key={message.id}
               message={message.content}
               isUser={message.role === 'user'}
-              // The useChat hook doesn't provide timestamps, so we remove it.
-              // We can add it back manually if needed, but it complicates state.
             />
           ))}
           
-          {isLoading && messages.length > 0 && messages[messages.length -1].role === 'user' && (
+          {isLoading && (
             <div className="flex gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-primary animate-pulse" />
@@ -80,17 +76,17 @@ export const ChatInterface = () => {
 
       {/* Input Area */}
       <div className="border-t bg-background/95 backdrop-blur-sm p-4">
-        {/* Use a form element for accessibility and to handle submission */}
+        {/* The handleSubmit function from useChat handles form submission */}
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
-            value={input}
-            onChange={handleInputChange}
+            value={input} // The input state is managed by useChat
+            onChange={handleInputChange} // The change handler is provided by useChat
             placeholder="Ask Maria about EO Goa..."
             className="flex-1 rounded-full border-primary/20 focus:border-primary"
             disabled={isLoading}
           />
           <Button
-            type="submit" // Set button type to submit
+            type="submit"
             disabled={!input.trim() || isLoading}
             size="icon"
             className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
