@@ -3,9 +3,9 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
 
-// Import the raw text content of the markdown file at build time.
-// This is the most efficient and reliable way to access the file content.
-import knowledgeBase from './content.md?raw';
+// Import the knowledgeBase constant from our new TypeScript module.
+// This is a standard import that Vercel's build system understands perfectly.
+import { knowledgeBase } from './content';
 
 // Configure the runtime for the edge
 export const config = {
