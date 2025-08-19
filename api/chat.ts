@@ -3,6 +3,10 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
 
+// Import the raw text content of the markdown file at build time.
+// This is the most efficient and reliable way to access the file content.
+import knowledgeBase from './content.md?raw';
+
 // Configure the runtime for the edge
 export const config = {
   runtime: 'edge',
@@ -17,18 +21,6 @@ export default async function handler(req: Request): Promise<Response> {
 
   try {
     const { messages } = await req.json();
-
-    // Determine the base URL for fetching the content file.
-    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-    const host = req.headers.get('host');
-    const baseUrl = `${protocol}://${host}`;
-
-    // Fetch the knowledge base from the public folder
-    const knowledgeBaseResponse = await fetch(new URL('/content.md', baseUrl));
-    if (!knowledgeBaseResponse.ok) {
-        throw new Error('Failed to fetch knowledge base.');
-    }
-    const knowledgeBase = await knowledgeBaseResponse.text();
 
     const systemPrompt = `You are Maria Fernandes, a friendly, warm, and knowledgeable virtual guide for the Entrepreneurs' Organization (EO) Goa chapter. You are a native of Goa and love its culture. Your personality is helpful and enthusiastic, with a touch of local Goan hospitality (you can use words like 'Olá!').
 
@@ -48,10 +40,9 @@ Now, continue the conversation with the user.`;
     
     // Call the streamText helper with the model, system prompt, and messages
     const result = await streamText({
-      // The provider handles the model ID correctly
       model: google('gemini-1.5-flash'),
       system: systemPrompt,
-      messages: messages, // The AI SDK expects messages in { role, content } format
+      messages: messages,
     });
 
     // Respond with the stream using the built-in Vercel AI SDK response helper
@@ -59,7 +50,6 @@ Now, continue the conversation with the user.`;
 
   } catch (error) {
     console.error("An error occurred in the chat API:", error);
-    // Return a more informative error response
     const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
     return new Response(`Error: ${errorMessage}`, { status: 500 });
   }
