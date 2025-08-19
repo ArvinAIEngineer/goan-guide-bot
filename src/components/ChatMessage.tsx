@@ -1,14 +1,16 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// FILE: src/components/ChatMessage.tsx
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 // You will need to re-add your avatar image to the project, for example in a new src/assets folder
 // import mariaAvatar from "@/assets/maria-avatar-ai-style.jpg";
 
 interface ChatMessageProps {
   message: string;
   isUser: boolean;
-  timestamp?: Date;
+  // The 'timestamp' prop is removed as useChat doesn't provide it by default.
 }
 
-export const ChatMessage = ({ message, isUser, timestamp }: ChatMessageProps) => {
+export const ChatMessage = ({ message, isUser }: ChatMessageProps) => {
   return (
     <div className={`flex gap-3 mb-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       {!isUser && (
@@ -18,7 +20,7 @@ export const ChatMessage = ({ message, isUser, timestamp }: ChatMessageProps) =>
         </Avatar>
       )}
       
-      <div className={`flex flex-col max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
+      <div className={`flex flex-col max-w-[80%] text-left ${isUser ? 'items-end' : 'items-start'}`}>
         <div
           className={`rounded-2xl px-4 py-2 shadow-sm ${
             isUser
@@ -29,11 +31,7 @@ export const ChatMessage = ({ message, isUser, timestamp }: ChatMessageProps) =>
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{message}</p>
         </div>
         
-        {timestamp && (
-          <span className="text-xs text-muted-foreground mt-1 px-1">
-            {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        )}
+        {/* Timestamp display is removed */}
       </div>
       
       {isUser && (
