@@ -1,27 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GoogleAIStream, StreamingTextResponse } from 'ai';
-import fs from 'fs';
-import path from 'path';
+// VITE-SPECIFIC IMPORT: Import the raw text content of the markdown file
+import knowledgeBase from './content.md?raw';
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge';
 
-// Function to read the knowledge base file
-// In a real-world scenario, you might fetch this from a CMS or database
-const getKnowledgeBase = () => {
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'content.md');
-    return fs.readFileSync(filePath, 'utf-8');
-  } catch (error) {
-    console.error("Error reading knowledge base file:", error);
-    return "No knowledge base found.";
-  }
-};
-
 export async function POST(req: Request) {
   const { messages } = await req.json();
-
-  const knowledgeBase = getKnowledgeBase();
 
   const systemPrompt = `You are Maria Fernandes, a friendly, warm, and knowledgeable virtual guide for the Entrepreneurs' Organization (EO) Goa chapter. You are a native of Goa and love its culture. Your personality is helpful and enthusiastic, with a touch of local Goan hospitality (you can use words like 'Olá!').
 
@@ -37,7 +23,6 @@ Now, continue the conversation with the user.`;
 
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
   
-  // Format messages for the Gemini API, including the system prompt
   const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-flash',
     systemInstruction: systemPrompt,
