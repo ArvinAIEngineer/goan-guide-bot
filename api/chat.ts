@@ -4,7 +4,6 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
 
 // Import the knowledgeBase constant from our new TypeScript module.
-// This is a standard import that Vercel's build system understands perfectly.
 import { knowledgeBase } from './content';
 
 // Configure the runtime for the edge
@@ -40,7 +39,9 @@ Now, continue the conversation with the user.`;
     
     // Call the streamText helper with the model, system prompt, and messages
     const result = await streamText({
-      model: google('gemini-1.5-flash'),
+      // *** THIS IS THE FIX ***
+      // The model ID must include the 'models/' prefix.
+      model: google('models/gemini-1.5-flash'),
       system: systemPrompt,
       messages: messages,
     });
