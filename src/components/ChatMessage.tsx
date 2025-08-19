@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import mariaAvatar from "@/assets/maria-avatar-ai-style.jpg";
+// You will need to re-add your avatar image to the project, for example in a new src/assets folder
+// import mariaAvatar from "@/assets/maria-avatar-ai-style.jpg";
 
 interface ChatMessageProps {
   message: string;
@@ -12,7 +13,7 @@ export const ChatMessage = ({ message, isUser, timestamp }: ChatMessageProps) =>
     <div className={`flex gap-3 mb-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       {!isUser && (
         <Avatar className="w-10 h-10 border-2 border-primary/20">
-          <AvatarImage src={mariaAvatar} alt="Maria" />
+          {/* <AvatarImage src={mariaAvatar} alt="Maria" /> */}
           <AvatarFallback className="bg-primary text-primary-foreground">M</AvatarFallback>
         </Avatar>
       )}
@@ -25,7 +26,7 @@ export const ChatMessage = ({ message, isUser, timestamp }: ChatMessageProps) =>
               : 'bg-card text-card-foreground border rounded-bl-md'
           }`}
         >
-          <p className="text-sm leading-relaxed">{message}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message}</p>
         </div>
         
         {timestamp && (
