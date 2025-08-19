@@ -14,7 +14,7 @@ export const ChatInterface = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // The useChat hook handles all the logic for you.
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     // The initial messages will be rendered on first load.
     initialMessages: [
       {
