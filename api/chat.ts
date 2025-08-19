@@ -1,7 +1,7 @@
 // FILE: api/chat.ts
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { GoogleAIStream, StreamingTextResponse } from 'ai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { streamText } from 'ai';
 
 // Configure the runtime for the edge
 export const config = {
@@ -9,7 +9,6 @@ export const config = {
 };
 
 // The handler must be a default export.
-// It can handle any request method, so we need to check for POST.
 export default async function handler(req: Request): Promise<Response> {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -20,7 +19,6 @@ export default async function handler(req: Request): Promise<Response> {
     const { messages } = await req.json();
 
     // Determine the base URL for fetching the content file.
-    // Using the URL constructor is safer than string concatenation.
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
     const host = req.headers.get('host');
     const baseUrl = `${protocol}://${host}`;
@@ -43,25 +41,21 @@ ${knowledgeBase}
 
 Now, continue the conversation with the user.`;
 
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
+    // Instantiate the Google provider using the createGoogleGenerativeAI factory
+    const google = createGoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_API_KEY,
+    });
     
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemPrompt,
+    // Call the streamText helper with the model, system prompt, and messages
+    const result = await streamText({
+      // The provider handles the model ID correctly
+      model: google('gemini-1.5-flash'),
+      system: systemPrompt,
+      messages: messages, // The AI SDK expects messages in { role, content } format
     });
 
-    const geminiMessages = messages.map((msg: { role: string; content: string }) => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }],
-    }));
-
-    const stream = await model.generateContentStream({
-      contents: geminiMessages,
-    });
-
-    const aiStream = GoogleAIStream(stream);
-
-    return new StreamingTextResponse(aiStream);
+    // Respond with the stream using the built-in Vercel AI SDK response helper
+    return result.toAIStreamResponse();
 
   } catch (error) {
     console.error("An error occurred in the chat API:", error);
