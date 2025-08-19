@@ -1,3 +1,5 @@
+// FILE: package.json
+
 {
   "name": "goan-guide-bot",
   "private": true,
