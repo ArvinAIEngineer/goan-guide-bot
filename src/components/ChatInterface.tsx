@@ -15,18 +15,14 @@ export const ChatInterface = () => {
 
   // The useChat hook handles all the logic for you.
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    // The initial messages will be rendered on first load.
     initialMessages: [
       {
         id: '1',
-        // The role for the AI's messages is 'assistant'.
         role: 'assistant',
         content: "Olá! I'm Maria from Goa! 🌴 I'm here to help you learn everything about EO Goa - our entrepreneurial community, events, members, and all things related to our beautiful organization. What would you like to know?",
       }
     ],
-    // The API route that the hook will call.
     api: '/api/chat',
-    // This function will be called if the API returns an error.
     onError: (err) => {
       console.error("Chat error:", err);
       toast({
@@ -76,11 +72,10 @@ export const ChatInterface = () => {
 
       {/* Input Area */}
       <div className="border-t bg-background/95 backdrop-blur-sm p-4">
-        {/* The handleSubmit function from useChat handles form submission */}
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
-            value={input} // The input state is managed by useChat
-            onChange={handleInputChange} // The change handler is provided by useChat
+            value={input}
+            onChange={handleInputChange}
             placeholder="Ask Maria about EO Goa..."
             className="flex-1 rounded-full border-primary/20 focus:border-primary"
             disabled={isLoading}
