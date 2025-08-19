@@ -1,3 +1,9 @@
+// FILE: api/content.ts
+
+// By exporting the knowledge base as a TypeScript string constant,
+// we make it a standard module that the Vercel build process can
+// easily bundle with the API route. This is the most reliable method.
+export const knowledgeBase = `
 Events for Members
 
 July 2025 Board Meeting is scheduled for Wednesday, 16 July 2025, at 6:30 PM at Amado Collective. It is a Board Meeting led by Ali, and is marked as Complete.
@@ -89,3 +95,4 @@ Links of Photos and Videos
 The Link for Photos and Videos for the Pickleball Social and Potluck - https://drive.google.com/drive/folders/10XJbBH-cJmVzvxFMAOu3WTaHbpr_0dxe
 
 The Link for gala 2025 Event - https://drive.google.com/drive/folders/1L4GKLd9KN-tyW60yFWPJk1xdEzLtF3Rn
+`;
